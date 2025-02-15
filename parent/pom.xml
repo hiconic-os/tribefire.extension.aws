@@ -21,18 +21,18 @@ limitations under the License.
     <packaging>pom</packaging>
     <properties>
         <java.version>1.8</java.version>
-        <V.tribefire.extension.aws>[2.7,2.8)</V.tribefire.extension.aws>
-        <V.com.braintribe.common>[1.0,1.1)</V.com.braintribe.common>
-        <V.com.braintribe.execution>[1.0,1.1)</V.com.braintribe.execution>
-        <V.com.braintribe.gm>[1.0,1.1)</V.com.braintribe.gm>
-        <V.com.braintribe.security>[1.0,1.1)</V.com.braintribe.security>
-        <V.com.braintribe.testing>[1.0,1.1)</V.com.braintribe.testing>
-        <V.com.braintribe.wire>[1.0,1.1)</V.com.braintribe.wire>
-        <V.tribefire.cortex>[2.0,2.1)</V.tribefire.cortex>
-        <V.tribefire.setup.classic.env>[2.3,2.4)</V.tribefire.setup.classic.env>
+        <V.tribefire.extension.aws>[3.0,3.1)</V.tribefire.extension.aws>
+        <V.com.braintribe.common>[2.0,2.1)</V.com.braintribe.common>
+        <V.com.braintribe.execution>[2.0,2.1)</V.com.braintribe.execution>
+        <V.com.braintribe.gm>[2.0,2.1)</V.com.braintribe.gm>
+        <V.com.braintribe.security>[2.0,2.1)</V.com.braintribe.security>
+        <V.com.braintribe.testing>[2.0,2.1)</V.com.braintribe.testing>
+        <V.com.braintribe.wire>[2.0,2.1)</V.com.braintribe.wire>
+        <V.tribefire.cortex>[3.0,3.1)</V.tribefire.cortex>
+        <V.tribefire.setup.classic.env>[3.0,3.1)</V.tribefire.setup.classic.env>
         <V.software.amazon.awssdk>2.21.21</V.software.amazon.awssdk>
         <V.com.github.ben-manes.caffeine>2.8.8</V.com.github.ben-manes.caffeine>
-        <V.com.google.guava>31.1-jre</V.com.google.guava>
+        <V.com.google.guava>33.4.0-jre</V.com.google.guava>
         <V.javax.servlet>3.0.1</V.javax.servlet>
         <V.org.bouncycastle>1.69</V.org.bouncycastle>
     </properties>
