@@ -18,7 +18,6 @@ package tribefire.extension.aws.templates.api;
 import java.util.function.Function;
 
 import com.braintribe.model.aws.deployment.S3Region;
-import com.braintribe.model.deployment.Cartridge;
 import com.braintribe.model.deployment.Module;
 import com.braintribe.model.descriptive.HasExternalId;
 import com.braintribe.model.generic.GenericEntity;
@@ -32,7 +31,6 @@ public class S3BinaryProcessTemplateContextImpl implements S3BinaryProcessTempla
 	private String idPrefix;
 	private String bucketName;
 	private String pathPrefix;
-	private Cartridge awsCartridge;
 
 	private Function<EntityType<?>, GenericEntity> entityFactory = EntityType::create;
 	private String awsAccessKey;
@@ -104,12 +102,6 @@ public class S3BinaryProcessTemplateContextImpl implements S3BinaryProcessTempla
 	}
 
 	@Override
-	public S3BinaryProcessTemplateContextBuilder setAwsCartridge(Cartridge awsCartridge) {
-		this.awsCartridge = awsCartridge;
-		return this;
-	}
-
-	@Override
 	public String getIdPrefix() {
 		return idPrefix;
 	}
@@ -137,11 +129,6 @@ public class S3BinaryProcessTemplateContextImpl implements S3BinaryProcessTempla
 	@Override
 	public String getPathPrefix() {
 		return pathPrefix;
-	}
-
-	@Override
-	public Cartridge getAwsCartridge() {
-		return awsCartridge;
 	}
 
 	@Override

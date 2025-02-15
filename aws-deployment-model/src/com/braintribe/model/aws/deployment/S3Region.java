@@ -15,7 +15,11 @@
 // ============================================================================
 package com.braintribe.model.aws.deployment;
 
-public enum S3Region {
+import com.braintribe.model.generic.base.EnumBase;
+import com.braintribe.model.generic.reflection.EnumType;
+import com.braintribe.model.generic.reflection.EnumTypes;
+
+public enum S3Region implements EnumBase<S3Region> {
 	
 	ap_south_1,
 	eu_north_1,
@@ -41,4 +45,10 @@ public enum S3Region {
 	aws_cn_global,
 	aws_us_gov_global;
 	
+	public static final EnumType<S3Region> T = EnumTypes.T(S3Region.class);
+
+	@Override
+	public EnumType<S3Region> type() {
+		return T;
+	}
 }

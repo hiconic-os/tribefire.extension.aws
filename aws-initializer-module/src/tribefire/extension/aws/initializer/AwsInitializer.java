@@ -76,13 +76,13 @@ public class AwsInitializer extends AbstractInitializer<AwsInitializerModuleMain
 	private void addMetaDataToModelsBinaryProcess(PersistenceInitializationContext context,
 			AwsInitializerModuleMainContract initializerMainContract) {
 		ModelMetaDataEditor modelEditor = BasicModelMetaDataEditor.create(initializerMainContract.initializerModelsContract().configuredDataModel())
-				.withEtityFactory(context.getSession()::create).done();
+				.withEntityFactory(context.getSession()::create).done();
 		modelEditor.onEntityType(S3Source.T).addMetaData(initializerMainContract.initializerContract().binaryProcessWith());
 	}
 
 	private void addMetaDataToModelsProcess(PersistenceInitializationContext context, AwsInitializerModuleMainContract initializerMainContract) {
 		ModelMetaDataEditor modelEditor = BasicModelMetaDataEditor
-				.create(initializerMainContract.initializerModelsContract().configuredServiceModel()).withEtityFactory(context.getSession()::create)
+				.create(initializerMainContract.initializerModelsContract().configuredServiceModel()).withEntityFactory(context.getSession()::create)
 				.done();
 		modelEditor.onEntityType(AwsRequest.T).addMetaData(initializerMainContract.initializerContract().serviceProcessWith());
 	}
@@ -90,7 +90,7 @@ public class AwsInitializer extends AbstractInitializer<AwsInitializerModuleMain
 	private void addMetaDataToDeploymentModel(PersistenceInitializationContext context, AwsInitializerModuleMainContract initializerMainContract) {
 		ModelMetaDataEditor modelEditor = BasicModelMetaDataEditor
 				.create(initializerMainContract.initializerModelsContract().configuredDeploymentModel())
-				.withEtityFactory(context.getSession()::create).done();
+				.withEntityFactory(context.getSession()::create).done();
 
 		AwsInitializerModuleContract initializerContract = initializerMainContract.initializerContract();
 		//@formatter:off
@@ -102,7 +102,7 @@ public class AwsInitializer extends AbstractInitializer<AwsInitializerModuleMain
 
 	private void addMetaDataToServiceModel(PersistenceInitializationContext context, AwsInitializerModuleMainContract initializerMainContract) {
 		ModelMetaDataEditor modelEditor = BasicModelMetaDataEditor
-				.create(initializerMainContract.initializerModelsContract().configuredServiceModel()).withEtityFactory(context.getSession()::create)
+				.create(initializerMainContract.initializerModelsContract().configuredServiceModel()).withEntityFactory(context.getSession()::create)
 				.done();
 
 		AwsInitializerModuleContract initializerContract = initializerMainContract.initializerContract();

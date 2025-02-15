@@ -39,9 +39,9 @@ limitations under the License.
             <version>${V.tribefire.extension.aws}</version>
         </dependency>
         <dependency>
-            <groupId>com.braintribe.gm</groupId>
+            <groupId>tribefire.cortex</groupId>
             <artifactId>access-deployment-model</artifactId>
-            <version>${V.com.braintribe.gm}</version>
+            <version>${V.tribefire.cortex}</version>
         </dependency>
         <dependency>
             <groupId>com.braintribe.gm</groupId>
@@ -77,11 +77,6 @@ limitations under the License.
             <groupId>com.braintribe.gm</groupId>
             <artifactId>instant-type-weaving</artifactId>
             <version>${V.com.braintribe.gm}</version>
-        </dependency>
-        <dependency>
-            <groupId>tribefire.cortex</groupId>
-            <artifactId>action-processing-api</artifactId>
-            <version>${V.tribefire.cortex}</version>
         </dependency>
         <dependency>
             <groupId>tribefire.cortex</groupId>

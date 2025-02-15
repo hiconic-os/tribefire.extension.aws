@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
 Copyright BRAINTRIBE TECHNOLOGY GMBH, Austria, 2002-2022
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,8 +21,7 @@ limitations under the License.
     </parent>
     <artifactId>aws-initializer-module</artifactId>
     <version>3.0.1</version>
-    <properties>
-    </properties>
+    <properties/>
     <licenses>
         <license>
             <name>Apache License, Version 2.0</name>
@@ -67,6 +66,11 @@ limitations under the License.
             <artifactId>aws-service-model</artifactId>
             <version>${V.tribefire.extension.aws}</version>
             <?tag asset?>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
+            <artifactId>model-oracle</artifactId>
+            <version>${V.com.braintribe.gm}</version>
         </dependency>
     </dependencies>
 </project>

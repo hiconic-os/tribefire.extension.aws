@@ -25,6 +25,7 @@ import java.util.Random;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.braintribe.common.lcd.Pair;
 import com.braintribe.model.aws.deployment.S3Region;
@@ -38,9 +39,12 @@ import com.braintribe.model.resourceapi.stream.GetBinaryResponse;
 import com.braintribe.model.resourceapi.stream.StreamBinaryResponse;
 import com.braintribe.model.resourceapi.stream.range.RangeResponse;
 import com.braintribe.model.resourceapi.stream.range.StreamRange;
+import com.braintribe.testing.category.SpecialEnvironment;
 import com.braintribe.testing.tools.gm.GmTestTools;
 import com.braintribe.utils.IOTools;
 
+//Probably should work with the right credentials
+@Category(SpecialEnvironment.class)
 public class S3BinaryProcessorTest {
 
 	private static S3ConnectionImpl connection;

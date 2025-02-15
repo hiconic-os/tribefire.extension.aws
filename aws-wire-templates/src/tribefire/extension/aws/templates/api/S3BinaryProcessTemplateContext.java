@@ -16,7 +16,6 @@
 package tribefire.extension.aws.templates.api;
 
 import com.braintribe.model.aws.deployment.S3Region;
-import com.braintribe.model.deployment.Cartridge;
 import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.reflection.EntityType;
 import com.braintribe.wire.api.scope.InstanceConfiguration;
@@ -54,8 +53,6 @@ public interface S3BinaryProcessTemplateContext {
 	String getCloudFrontPublicKey();
 
 	String getCloudFrontKeyGroupId();
-
-	Cartridge getAwsCartridge();
 
 	com.braintribe.model.deployment.Module getAwsModule();
 

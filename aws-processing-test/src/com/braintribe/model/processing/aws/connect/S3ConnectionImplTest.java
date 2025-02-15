@@ -25,11 +25,15 @@ import java.util.Set;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 
 import com.braintribe.model.aws.deployment.S3Region;
 import com.braintribe.model.processing.aws.service.AwsTestCredentials;
+import com.braintribe.testing.category.SpecialEnvironment;
 import com.braintribe.utils.RandomTools;
 
+// Probably should work with the right credentials
+@Category(SpecialEnvironment.class)
 public class S3ConnectionImplTest {
 
 	private static S3ConnectionImpl connection;

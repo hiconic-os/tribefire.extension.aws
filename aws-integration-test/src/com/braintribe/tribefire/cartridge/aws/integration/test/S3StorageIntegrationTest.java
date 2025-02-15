@@ -32,7 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import com.braintribe.logging.Logger;
-import com.braintribe.model.accessdeployment.smood.SmoodAccess;
+import com.braintribe.model.accessdeployment.smood.CollaborativeSmoodAccess;
 import com.braintribe.model.aws.deployment.S3Connector;
 import com.braintribe.model.aws.deployment.S3Region;
 import com.braintribe.model.aws.deployment.processor.S3BinaryProcessor;
@@ -94,10 +94,10 @@ public class S3StorageIntegrationTest extends AbstractTribefireQaTest {
 
 		PersistenceGmSession session = imp.session();
 
-		EntityQuery query = EntityQueryBuilder.from(SmoodAccess.T).where().property(SmoodAccess.externalId).eq("test.s3.storage").done();
-		SmoodAccess access = session.query().entities(query).first();
+		EntityQuery query = EntityQueryBuilder.from(CollaborativeSmoodAccess.T).where().property(CollaborativeSmoodAccess.externalId).eq("test.s3.storage").done();
+		CollaborativeSmoodAccess access = session.query().entities(query).first();
 		if (access == null) {
-			access = session.create(SmoodAccess.T);
+			access = session.create(CollaborativeSmoodAccess.T);
 			access.setExternalId("test.s3.storage");
 			access.setGlobalId("test.s3.storage");
 			access.setMetaModel(awsUserModel);

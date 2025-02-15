@@ -39,7 +39,6 @@ public class AwsTemplatesSpace implements AwsTemplatesContract {
 	@Managed
 	public S3BinaryProcessor s3StorageBinaryProcessor(S3BinaryProcessTemplateContext context) {
 		S3BinaryProcessor bean = context.create(S3BinaryProcessor.T, InstanceConfiguration.currentInstance());
-		bean.setCartridge(context.getAwsCartridge());
 		bean.setModule(context.getAwsModule());
 		bean.setName("S3 Storage Binary Processor " + context.getBucketName());
 		bean.setConnection(connector(context));
@@ -53,7 +52,6 @@ public class AwsTemplatesSpace implements AwsTemplatesContract {
 	@Managed
 	public S3Connector connector(S3BinaryProcessTemplateContext context) {
 		S3Connector bean = context.create(S3Connector.T, InstanceConfiguration.currentInstance());
-		bean.setCartridge(context.getAwsCartridge());
 		bean.setModule(context.getAwsModule());
 		bean.setName("S3 Connector " + context.getName());
 		bean.setAwsAccessKey(context.getAwsAccessKey());

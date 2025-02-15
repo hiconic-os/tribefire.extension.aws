@@ -18,7 +18,6 @@ package tribefire.extension.aws.templates.api;
 import java.util.function.Function;
 
 import com.braintribe.model.aws.deployment.S3Region;
-import com.braintribe.model.deployment.Cartridge;
 import com.braintribe.model.generic.GenericEntity;
 import com.braintribe.model.generic.reflection.EntityType;
 
@@ -54,8 +53,6 @@ public interface S3BinaryProcessTemplateContextBuilder {
 	S3BinaryProcessTemplateContextBuilder setBucketName(String bucketName);
 
 	S3BinaryProcessTemplateContextBuilder setEntityFactory(Function<EntityType<?>, GenericEntity> entityFactory);
-
-	S3BinaryProcessTemplateContextBuilder setAwsCartridge(Cartridge awsCartridge);
 
 	S3BinaryProcessTemplateContextBuilder setAwsModule(com.braintribe.model.deployment.Module awsModule);
 

@@ -36,20 +36,17 @@ limitations under the License.
         <dependency>
             <groupId>com.braintribe.gm</groupId>
             <artifactId>root-model</artifactId>
-            <scope>compile</scope>
             <version>${V.com.braintribe.gm}</version>
         </dependency>
         <dependency>
-            <groupId>com.braintribe.gm</groupId>
+            <groupId>tribefire.cortex</groupId>
             <artifactId>access-deployment-model</artifactId>
-            <scope>compile</scope>
-            <version>${V.com.braintribe.gm}</version>
+            <version>${V.tribefire.cortex}</version>
         </dependency>
         <dependency>
-            <groupId>com.braintribe.gm</groupId>
+            <groupId>tribefire.cortex</groupId>
             <artifactId>extension-deployment-model</artifactId>
-            <scope>compile</scope>
-            <version>${V.com.braintribe.gm}</version>
+            <version>${V.tribefire.cortex}</version>
         </dependency>
         <dependency>
             <groupId>tribefire.cortex</groupId>

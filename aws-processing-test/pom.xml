@@ -49,9 +49,9 @@ limitations under the License.
             <version>${V.com.braintribe.gm}</version>
         </dependency>
         <dependency>
-            <groupId>tribefire.cortex</groupId>
-            <artifactId>gm-web-streaming-server-test</artifactId>
-            <version>${V.tribefire.cortex}</version>
+            <groupId>tribefire.extension.web-api</groupId>
+            <artifactId>web-api-test-tools</artifactId>
+            <version>${V.tribefire.extension.web-api}</version>
         </dependency>
         <dependency>
             <groupId>com.braintribe.gm</groupId>
