@@ -31,7 +31,7 @@ limitations under the License.
         </license>
     </licenses>
     <artifactId>aws-aggregator</artifactId>
-    <version>3.0.3</version>
+    <version>3.0.4</version>
     <dependencies>
         <dependency>
             <groupId>tribefire.extension.aws</groupId>
