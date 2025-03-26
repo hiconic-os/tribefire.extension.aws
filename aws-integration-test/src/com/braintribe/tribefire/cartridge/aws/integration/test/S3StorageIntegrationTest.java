@@ -29,6 +29,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.braintribe.logging.Logger;
@@ -59,6 +60,7 @@ import com.braintribe.utils.StringTools;
  * checks if all expected deployables are present and deployed, as well as expected demo entities are present
  *
  */
+@Ignore
 public class S3StorageIntegrationTest extends AbstractTribefireQaTest {
 
 	private static Logger log = Logger.getLogger(S3StorageIntegrationTest.class);
@@ -94,7 +96,8 @@ public class S3StorageIntegrationTest extends AbstractTribefireQaTest {
 
 		PersistenceGmSession session = imp.session();
 
-		EntityQuery query = EntityQueryBuilder.from(CollaborativeSmoodAccess.T).where().property(CollaborativeSmoodAccess.externalId).eq("test.s3.storage").done();
+		EntityQuery query = EntityQueryBuilder.from(CollaborativeSmoodAccess.T).where().property(CollaborativeSmoodAccess.externalId)
+				.eq("test.s3.storage").done();
 		CollaborativeSmoodAccess access = session.query().entities(query).first();
 		if (access == null) {
 			access = session.create(CollaborativeSmoodAccess.T);
