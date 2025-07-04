@@ -30,7 +30,7 @@ limitations under the License.
         <V.tribefire.cortex>[3.0,3.1)</V.tribefire.cortex>
         <V.tribefire.setup.classic.env>[3.0,3.1)</V.tribefire.setup.classic.env>
         <V.tribefire.extension.web-api>[1.0,1.1)</V.tribefire.extension.web-api>
-        <V.software.amazon.awssdk>2.21.21</V.software.amazon.awssdk>
+        <V.software.amazon.awssdk>2.31.76</V.software.amazon.awssdk>
         <V.com.github.ben-manes.caffeine>3.2.0</V.com.github.ben-manes.caffeine>
         <V.com.google.guava>33.4.0-jre</V.com.google.guava>
         <V.javax.servlet>3.0.1</V.javax.servlet>
