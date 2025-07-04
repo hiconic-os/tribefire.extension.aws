@@ -34,7 +34,7 @@ limitations under the License.
         <V.com.github.ben-manes.caffeine>3.2.0</V.com.github.ben-manes.caffeine>
         <V.com.google.guava>33.4.0-jre</V.com.google.guava>
         <V.javax.servlet>3.0.1</V.javax.servlet>
-        <V.org.bouncycastle>1.69</V.org.bouncycastle>
+        <V.org.bouncycastle>1.81</V.org.bouncycastle>
     </properties>
     <licenses>
         <license>
