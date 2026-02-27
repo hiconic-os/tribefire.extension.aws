@@ -13,14 +13,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // ============================================================================
-package com.braintribe.model.processing.aws.connect;
+package tribefire.extension.aws.processing;
 
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.lang.reflect.Field;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -35,6 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -54,10 +57,21 @@ import com.braintribe.cfg.Required;
 import com.braintribe.common.lcd.Numbers;
 import com.braintribe.exception.Exceptions;
 import com.braintribe.execution.ExtendedThreadPoolExecutor;
+import com.braintribe.gm.model.reason.Maybe;
+import com.braintribe.gm.model.reason.ReasonException;
+import com.braintribe.gm.model.reason.Reasons;
+import com.braintribe.gm.model.reason.essential.IoError;
+import com.braintribe.gm.model.reason.essential.NotFound;
 import com.braintribe.logging.Logger;
 import com.braintribe.model.aws.api.ConnectionStatistics;
-import com.braintribe.model.aws.deployment.S3Region;
+import com.braintribe.model.generic.session.InputStreamProvider;
+import com.braintribe.model.processing.aws.connect.S3Connector;
+import com.braintribe.model.processing.aws.connect.S3InputStreamResult;
+import com.braintribe.model.processing.aws.connect.S3InputStreamResultRecord;
 import com.braintribe.model.processing.aws.util.ErrorCodes;
+import com.braintribe.model.resourceapi.stream.condition.FingerprintMismatch;
+import com.braintribe.model.resourceapi.stream.condition.ModifiedSince;
+import com.braintribe.model.resourceapi.stream.condition.StreamCondition;
 import com.braintribe.utils.FileTools;
 import com.braintribe.utils.IOTools;
 import com.braintribe.utils.StringTools;
@@ -68,7 +82,6 @@ import com.braintribe.utils.stream.RangeInputStream;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.awscore.exception.AwsErrorDetails;
-import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.exception.SdkException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
@@ -92,7 +105,7 @@ import software.amazon.awssdk.services.s3.model.GetBucketLocationRequest;
 import software.amazon.awssdk.services.s3.model.GetBucketLocationResponse;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest;
 import software.amazon.awssdk.services.s3.model.GetObjectRequest.Builder;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
+import software.amazon.awssdk.services.s3.model.HeadObjectRequest;
 import software.amazon.awssdk.services.s3.model.ListBucketsRequest;
 import software.amazon.awssdk.services.s3.model.ListBucketsResponse;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
@@ -108,7 +121,6 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 
 	private static Logger logger = Logger.getLogger(S3ConnectionImpl.class);
 
-	private com.braintribe.model.aws.deployment.S3Connector s3ConnectorDeployable;
 	private S3Client masterClient;
 	private Map<Region, S3Client> clientPerRegion = new ConcurrentHashMap<>();
 	private Map<String, S3Client> clientPerBucket = new ConcurrentHashMap<>();
@@ -123,9 +135,39 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 	private Long socketTimeout;
 	private Set<SdkHttpClient> httpClients = Collections.synchronizedSet(new HashSet<>());
 	private Map<Region, PoolingHttpClientConnectionManager> poolStatsPerRegion = new ConcurrentHashMap<>();
-
+	private String region;
+	private String awsAccessKey;
+	private String awsSecretAccessKey;
+	private String urlOverride;
+	private Integer streamingPoolSize;
+	
 	private static int uploadBufferSize = (int) (Numbers.MEBIBYTE * 6);
+	
+	@Configurable
+	public void setRegion(String region) {
+		this.region = region;
+	}
 
+	@Required
+	public void setAwsAccessKey(String awsAccessKey) {
+		this.awsAccessKey = awsAccessKey;
+	}
+	
+	@Required
+	public void setAwsSecretAccessKey(String awsSecretAccessKey) {
+		this.awsSecretAccessKey = awsSecretAccessKey;
+	}
+	
+	@Configurable
+	public void setUrlOverride(String urlOverride) {
+		this.urlOverride = urlOverride;
+	}
+	
+	@Configurable
+	public void setStreamingPoolSize(Integer streamingPoolSize) {
+		this.streamingPoolSize = streamingPoolSize;
+	}
+	
 	public S3Client getMasterClient() {
 		if (masterClient != null)
 			return masterClient;
@@ -136,12 +178,9 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 
 	private Region getDefaultRegion() {
 		if (defaultRegion == null) {
-			S3Region region = s3ConnectorDeployable.getRegion();
-			if (region == null) {
-				region = S3Region.eu_west_1;
-			}
-			String regionString = region.name().replace('_', '-');
-			defaultRegion = Region.of(regionString);
+			defaultRegion = region != null?
+					Region.of(region):
+					Region.EU_WEST_1;
 		}
 		return defaultRegion;
 	}
@@ -156,7 +195,7 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 				return threadPool;
 			}
 
-			Integer poolSize = s3ConnectorDeployable.getStreamingPoolSize();
+			Integer poolSize = streamingPoolSize;
 			if (poolSize == null || poolSize < 1) {
 				poolSize = 10;
 			}
@@ -238,7 +277,15 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 
 		S3Client client = ensureBucket(bucketName, getDefaultRegion());
 
-		if (fileSize != null && fileSize > 0) {
+		if (fileSize != null && fileSize <= uploadBufferSize) {
+			software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder builder = PutObjectRequest.builder().bucket(bucketName).key(key);
+			if (!StringTools.isBlank(contentType)) {
+				builder.contentType(contentType);
+			}
+			PutObjectRequest putObjectRequest = builder.build();
+			client.putObject(putObjectRequest, RequestBody.fromInputStream(in, fileSize));
+		}
+		else {
 			software.amazon.awssdk.services.s3.model.CreateMultipartUploadRequest.Builder builder = CreateMultipartUploadRequest.builder().bucket(bucketName).key(key);
 			if (!StringTools.isBlank(contentType)) {
 				builder.contentType(contentType);
@@ -250,13 +297,6 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 			logger.debug(() -> "Uploading " + key + " with upload Id: " + uploadId);
 
 			doMultipartUpload(bucketName, key, in, client, uploadId);
-		} else {
-			software.amazon.awssdk.services.s3.model.PutObjectRequest.Builder builder = PutObjectRequest.builder().bucket(bucketName).key(key);
-			if (!StringTools.isBlank(contentType)) {
-				builder.contentType(contentType);
-			}
-			PutObjectRequest putObjectRequest = builder.build();
-			client.putObject(putObjectRequest, RequestBody.fromBytes(new byte[0]));
 		}
 	}
 
@@ -453,21 +493,110 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 
 	@Override
 	public InputStream openStream(String bucketName, String key, Long start, Long end) {
-
-		Builder builder = GetObjectRequest.builder().bucket(bucketName).key(key);
-		if (start != null && end != null) {
-			builder.range("bytes=" + start + "-" + end);
+		try {
+			return openStreamEx(bucketName, key, start, end).get().openStream();
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
 		}
-		GetObjectRequest request = builder.build();
-
+	}
+	
+	@Override
+	public Maybe<S3InputStreamResult> openStreamEx(String bucketName, String key, Long start, Long end) {
+		return openStreamEx(bucketName, key, start, end, null);
+	}
+	
+	private InputStream openStream(String bucketName, String key, GetObjectRequest request) throws IOException {
 		S3Client client = getClient(bucketName);
 		try {
-			ResponseInputStream<GetObjectResponse> inputStream = client.getObject(request, ResponseTransformer.toInputStream());
-			return inputStream;
-
-		} catch (SdkException e) {
-			throw Exceptions.unchecked(e, "AWS S3 exception at downloadFile");
+			return client.getObject(request, ResponseTransformer.toInputStream());
+		} 
+		catch (S3Exception e) {
+		    if (e.statusCode() == 404) {
+		    	FileNotFoundException notFoundEx = new FileNotFoundException("Could not find S3 resource with key [" + key + "] from bucket [" + bucketName + "]");
+		    	notFoundEx.initCause(e);
+		    	throw notFoundEx;
+		    } else {
+		    	throw new IOException("HTTP error [" + e.statusCode() + "] while opening S3 resource with key [" + key + "] from bucket [" + bucketName + "]", e);
+		    }
 		}
+		catch (Exception e) {
+			throw new IOException("Error while opening S3 resource with key [" + key + "] from bucket [" + bucketName + "]", e);
+		}
+	}
+	
+	public Maybe<S3InputStreamResult> openStreamEx(String bucketName, String key, Long start, Long end, StreamCondition condition) {
+		boolean notModified = false;
+		
+		if (condition != null) {
+			HeadObjectRequest.Builder builder = HeadObjectRequest.builder().bucket(bucketName).key(key);
+			configureCondition(builder, condition);
+			
+			HeadObjectRequest headObjectRequest = builder.build();
+			
+			try {
+				S3Client client = getClient(bucketName);
+				client.headObject(headObjectRequest);
+			} 
+			catch (S3Exception e) {
+				if (e.statusCode() == 304) {
+					notModified = true;
+				}
+			    if (e.statusCode() == 404) {
+			    	return Reasons.build(NotFound.T).text("Resource payload not found").toMaybe();
+			    } else {
+			    	String tracebackId = UUID.randomUUID().toString();
+			    	String tracebackTail = " (tracebackId=" + tracebackId + ")";
+			    	String commonMsg = "HTTP error [" + e.statusCode() + "]";
+			    	
+			    	String loggerMsg = commonMsg + " while opening S3 resource with key [" + key + "] from bucket [" + bucketName + "]" + tracebackTail;
+			    	String reasonMsg = commonMsg + tracebackTail;
+			    	
+			    	logger.error(loggerMsg, e);
+			    	return Reasons.build(IoError.T).text(reasonMsg).toMaybe();
+			    }
+			}
+			catch (Exception e) {
+				throw new RuntimeException("Error while opening S3 resource with key [" + key + "] from bucket [" + bucketName + "]", e);
+			}
+		}
+
+		Builder builder = GetObjectRequest.builder().bucket(bucketName).key(key);
+		if (start != null || end != null) {
+			builder.range(toRangeHeader(start, end));
+		}
+		
+		GetObjectRequest request = builder.build();
+		
+		InputStreamProvider isp = () -> openStream(bucketName, key, request);
+
+		// TODO: use information from head request if available anyways or asked explicitly for
+		return Maybe.complete(new S3InputStreamResultRecord(isp, notModified, null, null, null, null));
+	}
+	
+	private void configureCondition(HeadObjectRequest.Builder builder, StreamCondition condition) {
+		switch (condition) {
+			case FingerprintMismatch fm -> {
+				builder.ifNoneMatch(fm.getFingerprint());
+			}
+			case ModifiedSince ms -> {
+				builder.ifModifiedSince(ms.getDate().toInstant());
+			}
+			default -> {}
+		}
+	}
+
+	private static String toRangeHeader(Long start, Long end) {
+	    if (start != null && end != null) {
+	        if (start > end) {
+	            throw new IllegalArgumentException("start must be <= end");
+	        }
+	        return "bytes=" + start + "-" + end;
+	    }
+	    if (start != null) {
+	        return "bytes=" + start + "-";
+	    }
+	    // start == null && end != null
+	    return "bytes=-" + end;
 	}
 
 	@Override
@@ -512,23 +641,16 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 		}
 	}
 
-	@Required
-	@Configurable
-	public void setS3ConnectorDeployable(com.braintribe.model.aws.deployment.S3Connector s3ConnectionDeployable) {
-		this.s3ConnectorDeployable = s3ConnectionDeployable;
-	}
-
 	private S3Client getClient(Region region) {
 		return clientPerRegion.computeIfAbsent(region, r -> {
-			AwsBasicCredentials awsCreds = AwsBasicCredentials.create(s3ConnectorDeployable.getAwsAccessKey(),
-					s3ConnectorDeployable.getAwsSecretAccessKey());
+			AwsBasicCredentials awsCreds = AwsBasicCredentials.create(awsAccessKey,
+					awsSecretAccessKey);
 			StaticCredentialsProvider awsCredsProvider = StaticCredentialsProvider.create(awsCreds);
 
 			logger.debug(() -> "Creating S3 Client for region " + region + " with pool size: " + httpConnectionPoolSize);
 
 			S3ClientBuilder builder = S3Client.builder().region(region).credentialsProvider(awsCredsProvider);
 
-			String urlOverride = s3ConnectorDeployable.getUrlOverride();
 			if (!StringTools.isBlank(urlOverride)) {
 				try {
 					builder.endpointOverride(new URI(urlOverride));
@@ -663,8 +785,8 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 	@Override
 	public String generatePresignedUrl(String bucketName, String key, long ttlInMs) {
 
-		AwsBasicCredentials awsCreds = AwsBasicCredentials.create(s3ConnectorDeployable.getAwsAccessKey(),
-				s3ConnectorDeployable.getAwsSecretAccessKey());
+		AwsBasicCredentials awsCreds = AwsBasicCredentials.create(awsAccessKey,
+				awsSecretAccessKey);
 		StaticCredentialsProvider awsCredsProvider = StaticCredentialsProvider.create(awsCreds);
 		Region region = getRegion(bucketName);
 

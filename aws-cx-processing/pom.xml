@@ -19,8 +19,8 @@ limitations under the License.
         <artifactId>parent</artifactId>
         <version>[3.0,3.1)</version>
     </parent>
-    <artifactId>aws-processing</artifactId>
-    <version>3.0.5</version>
+    <artifactId>aws-cx-processing</artifactId>
+    <version>3.0.1</version>
     <properties>
         <archetype>library</archetype>
     </properties>
@@ -39,6 +39,11 @@ limitations under the License.
             <version>${V.tribefire.extension.aws}</version>
         </dependency>
         <dependency>
+            <groupId>tribefire.cortex</groupId>
+            <artifactId>access-deployment-model</artifactId>
+            <version>${V.tribefire.cortex}</version>
+        </dependency>
+        <dependency>
             <groupId>com.braintribe.gm</groupId>
             <artifactId>meta-model</artifactId>
             <version>${V.com.braintribe.gm}</version>
@@ -55,8 +60,38 @@ limitations under the License.
         </dependency>
         <dependency>
             <groupId>com.braintribe.gm</groupId>
+            <artifactId>basic-access-adapters</artifactId>
+            <version>${V.com.braintribe.gm}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
             <artifactId>generic-model-core-tools</artifactId>
             <version>${V.com.braintribe.gm}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
+            <artifactId>access-interfaces</artifactId>
+            <version>${V.com.braintribe.gm}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.braintribe.gm</groupId>
+            <artifactId>instant-type-weaving</artifactId>
+            <version>${V.com.braintribe.gm}</version>
+        </dependency>
+        <dependency>
+            <groupId>tribefire.cortex</groupId>
+            <artifactId>deployment-processing-api</artifactId>
+            <version>${V.tribefire.cortex}</version>
+        </dependency>
+        <dependency>
+            <groupId>tribefire.cortex</groupId>
+            <artifactId>gm-worker-api</artifactId>
+            <version>${V.tribefire.cortex}</version>
+        </dependency>
+        <dependency>
+            <groupId>tribefire.cortex</groupId>
+            <artifactId>check-api</artifactId>
+            <version>${V.tribefire.cortex}</version>
         </dependency>
         <dependency>
             <groupId>com.braintribe.gm</groupId>
@@ -67,6 +102,23 @@ limitations under the License.
             <groupId>com.braintribe.execution</groupId>
             <artifactId>execution</artifactId>
             <version>${V.com.braintribe.execution}</version>
+        </dependency>
+        <!-- for TF App - servlet -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+            <scope>provided</scope>
+            <version>${V.javax.servlet}</version>
+        </dependency>
+        <dependency>
+            <groupId>tribefire.cortex</groupId>
+            <artifactId>basic-servlet-adapters</artifactId>
+            <version>${V.tribefire.cortex}</version>
+        </dependency>
+        <dependency>
+            <groupId>tribefire.extension.aws</groupId>
+            <artifactId>aws-service-model</artifactId>
+            <version>${V.tribefire.extension.aws}</version>
         </dependency>
         <dependency>
             <groupId>tribefire.extension.aws</groupId>

@@ -28,6 +28,7 @@ limitations under the License.
         <V.com.braintribe.testing>[2.0,2.1)</V.com.braintribe.testing>
         <V.com.braintribe.wire>[2.0,2.1)</V.com.braintribe.wire>
         <V.tribefire.cortex>[3.0,3.1)</V.tribefire.cortex>
+   		<V.hiconic.platform.reflex>[1.0,1.1)</V.hiconic.platform.reflex>
         <V.tribefire.setup.classic.env>[3.0,3.1)</V.tribefire.setup.classic.env>
         <V.tribefire.extension.web-api>[1.0,1.1)</V.tribefire.extension.web-api>
         <V.software.amazon.awssdk>2.31.76</V.software.amazon.awssdk>

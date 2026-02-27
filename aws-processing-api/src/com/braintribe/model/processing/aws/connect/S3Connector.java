@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.braintribe.gm.model.reason.Maybe;
 import com.braintribe.model.aws.api.ConnectionStatistics;
+import com.braintribe.model.resourceapi.stream.condition.StreamCondition;
 
 public interface S3Connector {
 
@@ -34,6 +36,10 @@ public interface S3Connector {
 	void downloadFile(String bucketName, String key, OutputStream os, Long start, Long end);
 
 	InputStream openStream(String bucketName, String key, Long start, Long end);
+	
+	Maybe<S3InputStreamResult> openStreamEx(String bucketName, String key, Long start, Long end);
+
+	Maybe<S3InputStreamResult> openStreamEx(String bucketName, String key, Long start, Long end, StreamCondition condition);
 
 	void deleteFile(String bucketName, String key);
 

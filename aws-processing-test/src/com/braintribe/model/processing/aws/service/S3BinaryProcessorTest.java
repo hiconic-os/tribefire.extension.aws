@@ -28,8 +28,6 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
 import com.braintribe.common.lcd.Pair;
-import com.braintribe.model.aws.deployment.S3Region;
-import com.braintribe.model.processing.aws.connect.S3ConnectionImpl;
 import com.braintribe.model.processing.resource.server.test.commons.TestResourceAccessFactory;
 import com.braintribe.model.processing.session.api.persistence.PersistenceGmSession;
 import com.braintribe.model.processing.session.impl.persistence.BasicPersistenceGmSession;
@@ -43,6 +41,9 @@ import com.braintribe.testing.category.SpecialEnvironment;
 import com.braintribe.testing.tools.gm.GmTestTools;
 import com.braintribe.utils.IOTools;
 
+import software.amazon.awssdk.regions.Region;
+import tribefire.extension.aws.processing.S3ConnectionImpl;
+
 //Probably should work with the right credentials
 @Category(SpecialEnvironment.class)
 public class S3BinaryProcessorTest {
@@ -52,13 +53,10 @@ public class S3BinaryProcessorTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		com.braintribe.model.aws.deployment.S3Connector deployable = com.braintribe.model.aws.deployment.S3Connector.T.create();
-		deployable.setRegion(S3Region.eu_central_1);
-		deployable.setAwsAccessKey(AwsTestCredentials.getAccessKey());
-		deployable.setAwsSecretAccessKey(AwsTestCredentials.getSecretAccessKey());
-
 		connection = new S3ConnectionImpl();
-		connection.setS3ConnectorDeployable(deployable);
+		connection.setRegion(Region.EU_CENTRAL_1.id());
+		connection.setAwsAccessKey(AwsTestCredentials.getAccessKey());
+		connection.setAwsSecretAccessKey(AwsTestCredentials.getSecretAccessKey());
 		// connection.setHttpConnectionPoolSize(10);
 	}
 

@@ -27,10 +27,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import com.braintribe.model.aws.deployment.S3Region;
 import com.braintribe.model.processing.aws.service.AwsTestCredentials;
 import com.braintribe.testing.category.SpecialEnvironment;
 import com.braintribe.utils.RandomTools;
+
+import software.amazon.awssdk.regions.Region;
+import tribefire.extension.aws.processing.S3ConnectionImpl;
 
 // Probably should work with the right credentials
 @Category(SpecialEnvironment.class)
@@ -41,13 +43,10 @@ public class S3ConnectionImplTest {
 
 	@BeforeClass
 	public static void beforeClass() {
-		com.braintribe.model.aws.deployment.S3Connector deployable = com.braintribe.model.aws.deployment.S3Connector.T.create();
-		deployable.setRegion(S3Region.eu_central_1);
-		deployable.setAwsAccessKey(AwsTestCredentials.getAccessKey());
-		deployable.setAwsSecretAccessKey(AwsTestCredentials.getSecretAccessKey());
-
 		connection = new S3ConnectionImpl();
-		connection.setS3ConnectorDeployable(deployable);
+		connection.setRegion(Region.EU_CENTRAL_1.id());
+		connection.setAwsAccessKey(AwsTestCredentials.getAccessKey());
+		connection.setAwsSecretAccessKey(AwsTestCredentials.getSecretAccessKey());
 		// connection.setHttpConnectionPoolSize(10);
 	}
 
@@ -71,13 +70,10 @@ public class S3ConnectionImplTest {
 
 	@Test
 	public void testInvalidCredentials() throws Exception {
-		com.braintribe.model.aws.deployment.S3Connector deployable = com.braintribe.model.aws.deployment.S3Connector.T.create();
-		deployable.setRegion(S3Region.eu_central_1);
-		deployable.setAwsAccessKey(AwsTestCredentials.getAccessKey());
-		deployable.setAwsSecretAccessKey("<not existing>");
-
 		S3ConnectionImpl failConnection = new S3ConnectionImpl();
-		failConnection.setS3ConnectorDeployable(deployable);
+		failConnection.setRegion(Region.EU_CENTRAL_1.id());
+		failConnection.setAwsAccessKey(AwsTestCredentials.getAccessKey());
+		failConnection.setAwsSecretAccessKey("<not existing>");
 		try {
 			Set<String> list = failConnection.getBucketsList();
 			fail("Received unexpected list of buckets: " + list);

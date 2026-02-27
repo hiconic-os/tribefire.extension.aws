@@ -16,9 +16,9 @@
 package tribefire.extension.aws.wire.space;
 
 import com.braintribe.logging.Logger;
+import com.braintribe.model.aws.deployment.S3Region;
 import com.braintribe.model.aws.deployment.processor.S3BinaryProcessor;
 import com.braintribe.model.cache.CacheOptions;
-import com.braintribe.model.processing.aws.connect.S3ConnectionImpl;
 import com.braintribe.model.processing.aws.connect.S3Connector;
 import com.braintribe.model.processing.aws.service.AwsServiceProcessor;
 import com.braintribe.model.processing.aws.service.HealthCheckProcessor;
@@ -31,6 +31,7 @@ import com.braintribe.wire.api.annotation.Import;
 import com.braintribe.wire.api.annotation.Managed;
 import com.braintribe.wire.api.space.WireSpace;
 
+import tribefire.extension.aws.processing.S3ConnectionImpl;
 import tribefire.module.wire.contract.ResourceProcessingContract;
 import tribefire.module.wire.contract.TribefireWebPlatformContract;
 
@@ -116,9 +117,16 @@ public class AwsDeployablesSpace implements WireSpace {
 			throw new IllegalStateException("Both the AWS Key and the AWS Secret Key must be set.");
 		}
 
+		S3Region s3region = deployable.getRegion();
+		
+		String region = s3region != null? s3region.name().replace('_', '-'): null;
+		
 		S3ConnectionImpl bean = new S3ConnectionImpl();
 
-		bean.setS3ConnectorDeployable(deployable);
+		bean.setAwsAccessKey(deployable.getAwsAccessKey());
+		bean.setAwsSecretAccessKey(deployable.getAwsSecretAccessKey());
+		bean.setRegion(region);
+		bean.setUrlOverride(deployable.getUrlOverride());
 		bean.setHttpConnectionPoolSize(deployable.getHttpConnectionPoolSize());
 		bean.setConnectionAcquisitionTimeout(deployable.getConnectionAcquisitionTimeout());
 		bean.setConnectionTimeout(deployable.getConnectionTimeout());

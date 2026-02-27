@@ -1,4 +1,4 @@
-<!--
+<?xml version="1.0" encoding="UTF-8"?><!--
 Copyright BRAINTRIBE TECHNOLOGY GMBH, Austria, 2002-2022
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -52,6 +52,11 @@ limitations under the License.
             <groupId>tribefire.extension.web-api</groupId>
             <artifactId>web-api-test-tools</artifactId>
             <version>${V.tribefire.extension.web-api}</version>
+        </dependency>
+        <dependency>
+            <groupId>tribefire.extension.aws</groupId>
+            <artifactId>aws-cx-processing</artifactId>
+            <version>${V.tribefire.extension.aws}</version>
         </dependency>
     </dependencies>
 </project>
