@@ -19,7 +19,7 @@ limitations under the License.
     <version>3.0.7</version>
     <packaging>pom</packaging>
     <properties>
-        <java.version>1.8</java.version>
+        <java.version>24</java.version>
         <V.tribefire.extension.aws>[3.0,3.1)</V.tribefire.extension.aws>
         <V.com.braintribe.common>[2.0,2.1)</V.com.braintribe.common>
         <V.com.braintribe.execution>[2.0,2.1)</V.com.braintribe.execution>
