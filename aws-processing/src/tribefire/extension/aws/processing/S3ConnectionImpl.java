@@ -587,17 +587,16 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 	}
 
 	private static String toRangeHeader(Long start, Long end) {
-	    if (start != null && end != null) {
-	        if (start > end) {
-	            throw new IllegalArgumentException("start must be <= end");
-	        }
-	        return "bytes=" + start + "-" + end;
-	    }
-	    if (start != null) {
-	        return "bytes=" + start + "-";
-	    }
-	    // start == null && end != null
-	    return "bytes=-" + end;
+		if (start == null)
+			start = 0L;
+
+		if (end == null)
+			return "bytes=" + start + "-";
+
+		if (start > end)
+			throw new IllegalArgumentException("start must be <= end");
+
+		return "bytes=" + start + "-" + end;
 	}
 
 	@Override
