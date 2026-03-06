@@ -58,7 +58,6 @@ import com.braintribe.common.lcd.Numbers;
 import com.braintribe.exception.Exceptions;
 import com.braintribe.execution.ExtendedThreadPoolExecutor;
 import com.braintribe.gm.model.reason.Maybe;
-import com.braintribe.gm.model.reason.ReasonException;
 import com.braintribe.gm.model.reason.Reasons;
 import com.braintribe.gm.model.reason.essential.IoError;
 import com.braintribe.gm.model.reason.essential.NotFound;
@@ -122,19 +121,19 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 	private static Logger logger = Logger.getLogger(S3ConnectionImpl.class);
 
 	private S3Client masterClient;
-	private Map<Region, S3Client> clientPerRegion = new ConcurrentHashMap<>();
-	private Map<String, S3Client> clientPerBucket = new ConcurrentHashMap<>();
-	private Map<String, Region> regionPerBucket = new ConcurrentHashMap<>();
+	private final Map<Region, S3Client> clientPerRegion = new ConcurrentHashMap<>();
+	private final Map<String, S3Client> clientPerBucket = new ConcurrentHashMap<>();
+	private final Map<String, Region> regionPerBucket = new ConcurrentHashMap<>();
 	private Set<String> knownBucketNames = Collections.synchronizedSet(new HashSet<>());
 	private Region defaultRegion;
 	private ExtendedThreadPoolExecutor threadPool;
-	private ReentrantLock threadPoolLock = new ReentrantLock();
+	private final ReentrantLock threadPoolLock = new ReentrantLock();
 	private Integer httpConnectionPoolSize;
 	private Long connectionAcquisitionTimeout;
 	private Long connectionTimeout;
 	private Long socketTimeout;
-	private Set<SdkHttpClient> httpClients = Collections.synchronizedSet(new HashSet<>());
-	private Map<Region, PoolingHttpClientConnectionManager> poolStatsPerRegion = new ConcurrentHashMap<>();
+	private final Set<SdkHttpClient> httpClients = Collections.synchronizedSet(new HashSet<>());
+	private final Map<Region, PoolingHttpClientConnectionManager> poolStatsPerRegion = new ConcurrentHashMap<>();
 	private String region;
 	private String awsAccessKey;
 	private String awsSecretAccessKey;
@@ -524,6 +523,7 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 		}
 	}
 	
+	@Override
 	public Maybe<S3InputStreamResult> openStreamEx(String bucketName, String key, Long start, Long end, StreamCondition condition) {
 		boolean notModified = false;
 		
@@ -581,7 +581,8 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 			case ModifiedSince ms -> {
 				builder.ifModifiedSince(ms.getDate().toInstant());
 			}
-			default -> {}
+			default -> {
+				/* NO OP */}
 		}
 	}
 
@@ -690,8 +691,8 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 				} catch (Throwable t) {
 					logger.debug(() -> "Could not access inner HTTP client. Deep inspection will not be possible.", t);
 				}
-
 			}
+			
 			httpClients.add(httpClient);
 
 			builder.httpClient(httpClient);
@@ -704,9 +705,8 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 
 	private S3Client getClient(String bucketName) {
 		return clientPerBucket.computeIfAbsent(bucketName, bn -> {
-
 			S3Client mClient = getMasterClient();
-			GetBucketLocationRequest locationRequest = GetBucketLocationRequest.builder().bucket(bucketName).build();
+			GetBucketLocationRequest locationRequest = GetBucketLocationRequest.builder().bucket(bn).build();
 			GetBucketLocationResponse bucketLocation = mClient.getBucketLocation(locationRequest);
 			BucketLocationConstraint locationConstraint = bucketLocation.locationConstraint();
 			String regionName = locationConstraint.toString();
@@ -722,15 +722,13 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 						+ getDefaultRegion());
 				return mClient;
 			}
-
 		});
 	}
 
 	private Region getRegion(String bucketName) {
 		return regionPerBucket.computeIfAbsent(bucketName, bn -> {
-
 			S3Client mClient = getMasterClient();
-			GetBucketLocationRequest locationRequest = GetBucketLocationRequest.builder().bucket(bucketName).build();
+			GetBucketLocationRequest locationRequest = GetBucketLocationRequest.builder().bucket(bn).build();
 			GetBucketLocationResponse bucketLocation = mClient.getBucketLocation(locationRequest);
 			BucketLocationConstraint locationConstraint = bucketLocation.locationConstraint();
 			String regionName = locationConstraint.toString();
@@ -744,7 +742,6 @@ public class S3ConnectionImpl implements S3Connector, DestructionAware {
 						+ getDefaultRegion());
 				return getDefaultRegion();
 			}
-
 		});
 	}
 
