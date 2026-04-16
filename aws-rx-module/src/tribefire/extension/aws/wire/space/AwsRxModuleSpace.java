@@ -8,8 +8,8 @@ import com.braintribe.model.processing.aws.connect.S3Connector;
 import com.braintribe.wire.api.annotation.Import;
 import com.braintribe.wire.api.annotation.Managed;
 
+import hiconic.rx.module.api.config.RxPlatformConfigurator;
 import hiconic.rx.module.api.wire.RxModuleContract;
-import hiconic.rx.module.api.wire.RxPlatformConfigurator;
 import hiconic.rx.module.api.wire.RxPlatformContract;
 import tribefire.extension.aws.model.configuration.AwsConfiguration;
 import tribefire.extension.aws.model.configuration.AwsConnection;
